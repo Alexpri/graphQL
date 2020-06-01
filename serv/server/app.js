@@ -2,11 +2,14 @@ const express = require('express')
 const graphqlHTTP = require('express-graphql')
 const schema = require('../schema/schema')
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 const app = express()
 const PORT = 3005
 
-mongoose.connect('mongodb://alex:Pass123@ds163834.mlab:63835/grapqh-proj', {useNewUrlParser: true})
+mongoose.connect('mongodb+srv://test:123@cluster0-mswn5.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
+
+app.use(cors())
 
 app.use('/graphql', graphqlHTTP({
   schema,

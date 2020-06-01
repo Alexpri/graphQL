@@ -24,7 +24,9 @@ class Directors extends React.Component {
 
   handleClose = () => { this.setState({ name: '', age: 0, id: null, open: false }); };
 
-  handleChange = name => ({ target }) => { this.setState({ [name]: target.value }); };
+  handleChange = name => ({ target }) => {
+    this.setState({ [name]: target.value });
+  };
 
   render() {
     const { name, age, id, open } = this.state;

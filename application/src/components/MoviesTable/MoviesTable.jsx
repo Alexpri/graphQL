@@ -14,6 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
 
 import MoviesDialog from '../MoviesDialog/MoviesDialog';
+import MoviesSearch from '../MoviesSearch/MoviesSearch';
 
 import withHocs from './MoviesTableHoc';
 
@@ -21,19 +22,26 @@ class MoviesTable extends React.Component {
   state = {
     anchorEl: null,
     openDialog: false,
+    name: ``
   };
 
-  handleDialogOpen = () => { this.setState({ openDialog: true }); };
-  handleDialogClose = () => { this.setState({ openDialog: false }); };
+  handleDialogOpen = () => {
+    this.setState({openDialog: true});
+  };
+  handleDialogClose = () => {
+    this.setState({openDialog: false});
+  };
 
-  handleClick = ({ currentTarget }, data) => {
+  handleClick = ({currentTarget}, data) => {
     this.setState({
       anchorEl: currentTarget,
       data,
     });
   };
 
-  handleClose = () => { this.setState({ anchorEl: null }); };
+  handleClose = () => {
+    this.setState({anchorEl: null});
+  };
 
   handleEdit = () => {
     this.props.onOpen(this.state.data);
@@ -45,15 +53,33 @@ class MoviesTable extends React.Component {
     this.handleClose();
   };
 
-  render() {
-    const { anchorEl, openDialog, data: activeElem = {} } = this.state;
+  handleChange = name => ({target}) => {
+    this.setState({[name]: target.value});
+  };
 
-    const { classes, data = {} } = this.props;
-    const { movies = [] } = data
+  handleSearch = (e) => {
+    const {data} = this.props
+    const {name} = this.state
+    if(e.charCode === 13) {
+      data.fetchMore({
+        variables: {name},
+        updateQuery: (previousResult, {fetchMoreResult}) => fetchMoreResult
+      })
+    }
+  }
+
+  render () {
+    const {anchorEl, openDialog, data: activeElem = {}, name} = this.state;
+
+    const {classes, data = {}} = this.props;
+    const {movies = []} = data
 
     return (
       <>
-        <MoviesDialog open={openDialog} handleClose={this.handleDialogClose} id={activeElem.id} />
+        <MoviesDialog open={openDialog} handleClose={this.handleDialogClose} id={activeElem.id}/>
+        <Paper>
+          <MoviesSearch name={name} handleChange={this.handleChange} handleSearch={this.handleSearch}/>
+        </Paper>
         <Paper className={classes.root}>
           <Table>
             <TableHead>
@@ -75,15 +101,15 @@ class MoviesTable extends React.Component {
                     <TableCell align="right">{movie.rate}</TableCell>
                     <TableCell>{movie.director.name}</TableCell>
                     <TableCell>
-                      <Checkbox checked={movie.watched} disabled />
+                      <Checkbox checked={movie.watched} disabled/>
                     </TableCell>
                     <TableCell align="right">
                       <>
                         <IconButton color="inherit" onClick={(e) => this.handleClick(e, movie)}>
-                          <MoreIcon />
+                          <MoreIcon/>
                         </IconButton>
-                        <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleClose} >
-                          <MenuItem onClick={this.handleEdit}><CreateIcon /> Edit</MenuItem>
+                        <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleClose}>
+                          <MenuItem onClick={this.handleEdit}><CreateIcon/> Edit</MenuItem>
                           <MenuItem onClick={this.handleDelete}><DeleteIcon/> Delete</MenuItem>
                         </Menu>
                       </>
